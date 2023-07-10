@@ -1,0 +1,411 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@section Scripts
+{
+
+<style>
+
+
+
+        
+
+body {
+  background: url(../img/bg.png) center no-repeat;
+  background-size: cover;
+  background-color: #b9c1d4;
+  margin: 0;
+  padding: 3vh 0;
+  font-family: 'Roboto', sans-serif; }
+
+img {
+  max-width: 100%; }
+
+
+#wrapper {
+  width: 90%;
+  height: 768px;
+  /*max-width: 90%;*/
+  max-height: 100%;
+  padding: 15px;
+  border-radius: 7px;
+  /*position: absolute;*/
+  /*left: 50%;*/
+  /*top: 50%;*/
+  /*transform: translate(-50%, -50%);*/
+  margin: auto;
+  background-image: -moz-linear-gradient(135deg, #fafaff 0%, #f7f7fc 100%);
+  background-image: -webkit-linear-gradient(135deg, #fafaff 0%, #f7f7fc 100%);
+  background-image: -ms-linear-gradient(135deg, #fafaff 0%, #f7f7fc 100%);
+  box-shadow: 0px 12px 30px 0px rgba(1, 50, 101, 0.07); }
+
+
+
+.message-content {
+  background: #fff;
+  border-radius: 7px;
+  box-shadow: 9px 9px 30px 0px rgba(1, 50, 101, 0.21);
+  width: 73%;
+  height: 100%;
+  float: right;
+  position: relative;
+  /* margin-left: 15px;*/ }
+  .message-content .message-content__item .message-content-header {
+    border-bottom: 1px solid #e0e2e4;
+    padding: 20px 15px;
+    position: relative;
+    height: 95px; }
+    .message-content .message-content__item .message-content-header .name {
+      font-size: 21px;
+      color: #535357;
+      font-weight: 500; }
+    .message-content .message-content__item .message-content-header .phone {
+      font-size: 16px;
+      color: #a3a3a7; }
+    .message-content .message-content__item .message-content-header img {
+      position: absolute;
+      top: 30px;
+      right: 15px; }
+  .message-content .message-box {
+    padding: 25px;
+    overflow: hidden;
+    height: 500px;
+    overflow-y: scroll;
+    /*height: calc(100% - 175px); */
+  }
+    .message-content .message-box .message-box__item {
+      margin-bottom: 15px; }
+      .message-content .message-box .message-box__item.incoming {
+        text-align: left; }
+        .message-content .message-box .message-box__item.incoming .time {
+          right: 0; }
+      .message-content .message-box .message-box__item.outgoing {
+        text-align: right; }
+        .message-content .message-box .message-box__item.outgoing .time {
+          left: 0; }
+      .message-content .message-box .message-box__item .name {
+        color: #535357;
+        font-size: 16px;
+        font-weight: 400; }
+      .message-content .message-box .message-box__item .box-text {
+          min-width: 125px;
+        background: #f0f2f4;
+        display: inline-block;
+        padding: 20px 15px;
+        padding-right: 50px;
+        font-size: 16px;
+        color: #535357;
+        border-radius: 7px;
+        max-width: 90%;
+        margin-top: 10px;
+        text-align: left;
+        position: relative;
+        margin-bottom: 20px; }
+        .message-content .message-box .message-box__item .box-text .time {
+          position: absolute;
+          bottom: -25px;
+          font-size: 13px;
+          color: #939397; }
+  .message-content .message-form {
+    height: 75px;
+    border-top: 1px solid #e0e2e4;
+    padding: 20px 15px; }
+    .message-content .message-form input {
+      width: calc(100% - 50px);
+      border: none;
+      font-size: 16px;
+      margin-top: 5px; }
+    .message-content .message-form img {
+      float: right;
+      margin-top: 10px; }
+
+
+
+
+.message-sidebar {
+  background: #d9d9d9;
+  border-radius: 7px;
+  box-shadow: 9px 9px 30px 0px rgba(1, 50, 101, 0.21);
+  width: 25%;
+  height: 100%;
+  float: left;
+  position: relative;
+  margin-right: 2%;
+  padding-top:15px;
+}
+
+.room-box{
+   padding: 10px;
+}
+.room-box:hover{
+   background-color:white;
+}
+
+#nickName{
+    width:40%;
+    margin-bottom:10px;
+    display:inline;
+    margin-right:1%;
+}
+
+
+#roomName{
+    width: 70%;
+    display: inline;
+    margin-right:1%;
+}
+
+
+
+#nickName-side
+{
+	width:100%;
+    height:100vh;
+    background-color:white;
+    position: fixed;
+    top: 0;
+    z-index: 5;
+}
+
+#nickName-side-box
+{
+	width:70%;
+    background-color:#efefef;;
+    margin: 35% 15% 0% 15%;
+    border-radius:15px;
+}
+
+    </style>
+
+
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+
+<script type="text/javascript">
+    var connection;
+    var playerCurrentRoomName;
+
+
+
+    $(document).ready(() => {
+        connection = new signalR.HubConnectionBuilder().withAutomaticReconnect([1000, 3000, 3000, 2000]).withUrl("https://localhost:7252/home").build();
+        start();
+
+        function start() {
+            connection.start().then(() => {
+                $("#loading").hide();
+                //connection.invoke("GetAllGroupMessages");
+                connection.invoke("GetAllRoomsAsync");
+            }).catch((err) => {
+                console.log(err); 
+                setTimeout(() => start(), 2000)
+            });
+        }
+
+
+
+        connection.on("GetAllGroupMessages", (players) => {
+            players.forEach((user, index) => {
+                    $(`.message-box`).append(`<div class="message-box__item incoming"><div class="name">${user.name}</div><div class="box-text">${user.messageContent}<div class="time">${user.dateTime}</div></div></div>`);
+            });
+        });
+
+        connection.on("GetGroupMessagesByGroup", (players) => {
+            $(`.message-box`).html(" ");
+            players.forEach((user, index) => {
+                $(`.message-box`).append(`<div class="message-box__item incoming"><div class="name">${user.name}</div><div class="box-text">${user.messageContent}<div class="time">${user.dateTime}</div></div></div>`);
+            });
+        });
+
+        connection.on("GetAllRooms", (rooms)=>{
+            $(`.message-sidebar`).html(" ");
+            rooms.forEach((room, index) => {
+                $(`.message-sidebar`).append(`<div class="room-box">${room.roomName} <span><button value="${room.roomName}" class="btn btn-primary btn-sm btnJoinRoom">Katıl</button></span></div>`);
+            });
+        });
+
+        connection.on("GetNewMessageByGroup", (name,message, currentDateTime) => {
+
+            var playerName=$("#nickName").val();
+
+            if(playerName==name)
+            {
+                $(`.message-box`).append(`<div class="message-box__item outgoing"><div class="name">${name}</div><div class="box-text">${message}<div class="time">${currentDateTime}</div></div></div>`);
+                return;
+            }
+
+
+            $(`.message-box`).append(`<div class="message-box__item incoming"><div class="name">${name}</div><div class="box-text">${message}<div class="time">${currentDateTime}</div></div></div>`);
+        });
+
+        
+         $("#joinChatLobby").click(() => {
+            let name = $("#nickName").val();
+
+            if(name==null || name=="")
+            {
+                alert("Kullanıcı adı zorunludur!");
+                return;
+            }
+            $(`.create-room`).hide();
+            $(`#nickName-side`).hide();
+            $(`.name`).text("Kullanıcı Adınız: "+name);
+            
+            
+        });
+
+
+        $("#btnSendMessage").click(() => {
+            let name = $("#nickName").val();
+            let playerMessage = $("#txtName").val();
+
+            if(name==null|| name=="")
+            {
+                alert("Kullanıcı adı zorunludur!");
+                return;
+            }
+
+            if(playerMessage==null|| playerMessage=="")
+            {
+                alert("Herhangi bir mesaj girilmedi!");
+                return;
+            }
+
+            if(playerCurrentRoomName==null|| playerCurrentRoomName=="")
+            {
+                alert("Herhangi bir odaya katılmadınız!");
+                return;
+            }
+
+            connection.invoke("SendMessageByGroupAsync", name,playerMessage,playerCurrentRoomName).catch((err) => {
+                console.log(err);
+            });
+        });
+
+        $("#btnShowCreateRoom").click(() => {
+            $(".create-room").toggle();
+        });
+
+        $("#btnCreateRoom").click(() => {
+            let roomName = $("#roomName").val();
+            $(`.message-box`).html(" ");
+            connection.invoke("RemoveToGroupAsync", playerCurrentRoomName);
+            playerCurrentRoomName=roomName;
+            connection.invoke("AddToGroupAsync", roomName);
+            connection.invoke("CreateRoomAsync", roomName);
+            connection.invoke("GetAllGroupMessagesAsync", roomName).catch((err) => {
+                console.log(err);
+            })
+        });
+            
+        $(function() {
+            $(document).on("click", '.btnJoinRoom', function(el) {
+                    //console.log($(el.target).val());
+                $(`.message-box`).html(" ");
+                connection.invoke("RemoveToGroupAsync", playerCurrentRoomName);
+                playerCurrentRoomName=$(el.target).val();
+                connection.invoke("AddToGroupAsync", playerCurrentRoomName);
+                connection.invoke("GetAllGroupMessagesAsync", playerCurrentRoomName).catch((err) => {
+                    console.log(err);
+                });
+            });
+        });
+
+
+        $(function() {
+            $(document).on("click", '.btnLeaveRoom', function(el) {
+                    console.log($(el.target).val());
+                $(`.message-box`).html(" ");
+                connection.invoke("RemoveToGroupAsync", $(el.target).val());
+            });
+        });
+
+     
+
+
+        connection.onreconnecting(err => {
+            $("#loading").show();
+            statusShow();
+        });
+
+        connection.onreconnected(connectionId => {
+            $("#loading").hide();
+            statusShow();
+            console.log("connectionId:" + connectionId)
+        });
+
+
+        connection.on("ReceiveClientCount", (clientCount) => {
+            console.log(clientCount);
+            $("#clientCount").text(clientCount);
+        });
+
+        connection.on("Notify", (countText) => {
+            $("#notify").html(`<div class="alert alert-success">${countText} </div>`)
+        });
+
+        connection.on("Error", (errorText) => {
+            alert(errorText);
+        });
+    });
+</script>
+
+}
+
+
+<div id="nickName-side">
+	<div id="nickName-side-box">
+    	<div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon3">Kullanıcı Adı:</span>
+            </div>
+        <input type="text" class="form-control" id="nickName" aria-describedby="basic-addon3">
+            <div class="input-group-append">
+                 <button class="btn btn-success" id="joinChatLobby" type="button">Katıl</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="wrapper">
+      @*<input class="form-control" type="text" id="nickName" />*@
+      <button class="btn btn-success" id="btnSendMessage">Mesaj Gönder</button>
+      <button class="btn btn-info mx-2" id="btnShowCreateRoom">Oda Kur</button>
+      <div class="create-room">
+          Oda Adı:
+          <input class="form-control" type="text" id="roomName" />
+            <button class="btn btn-success" id="btnCreateRoom">Oluştur</button>
+       </div>
+      <div class="message-sidebar">
+      </div>
+
+        <div class="message-content">
+
+            <div class="message-content__item">
+                <div class="message-content-header">
+                    <div class="name"></div>
+                    <div class="phone"></div>
+                </div>
+            </div>
+
+            <div class="message-box">
+             @*   <div class="message-box__item incoming">
+                    <div class="name">Muhammed ERDEM</div>
+
+                    <div class="box-text">
+                        Hey man!
+
+                        <div class="time">18:36</div>
+                    </div>
+                </div>*@
+            </div>
+
+            <div class="message-form">
+                <input type="text" placeholder="Mesajınızı buraya yazınız.."  id="txtName">
+            </div>
+
+        </div>
+    </div>
+
+

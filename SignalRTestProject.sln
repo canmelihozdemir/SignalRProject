@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33502.453
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRTestProject.Web", "SignalRTestProject\SignalRTestProject.Web.csproj", "{35683AC6-4E6F-4E58-B22B-4CADE2D2EF3E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRTestProject.API", "SignalRTestProject.API\SignalRTestProject.API.csproj", "{BA0641E4-A322-4640-B8E7-69470C39B56C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{35683AC6-4E6F-4E58-B22B-4CADE2D2EF3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35683AC6-4E6F-4E58-B22B-4CADE2D2EF3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35683AC6-4E6F-4E58-B22B-4CADE2D2EF3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35683AC6-4E6F-4E58-B22B-4CADE2D2EF3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA0641E4-A322-4640-B8E7-69470C39B56C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA0641E4-A322-4640-B8E7-69470C39B56C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA0641E4-A322-4640-B8E7-69470C39B56C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA0641E4-A322-4640-B8E7-69470C39B56C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E2DE4484-F7F5-4B7A-AB2F-350A72EF9FCA}
+	EndGlobalSection
+EndGlobal

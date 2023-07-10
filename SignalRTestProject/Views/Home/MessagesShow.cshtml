@@ -1,0 +1,41 @@
+﻿
+@{
+    ViewData["Title"] = "MessagesShow";
+}
+
+
+
+@section Scripts
+{
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+
+    <script type="text/javascript">
+            $(document).ready(() => {
+
+
+            var connection = new signalR.HubConnectionBuilder().withUrl("https://localhost:7252/messages").build();
+
+            connection.start().then(() => {
+                connection.invoke("GetAllMessages");
+            }).catch((err) => {
+                console.log(err);
+            });
+
+
+
+
+            connection.on("ReceiveAllMessages", (data) => {
+
+                //console.log(data);
+                document.getElementById('messages').innerHTML="";
+                data.forEach((item)=>{
+                    document.getElementById('messages').innerHTML+=`${item.name}: ${item.messageContent}      ${item.dateTime}<br>`;
+                });
+                
+
+            });
+
+        });
+    </script>
+}
+<div id="messages"></div>
